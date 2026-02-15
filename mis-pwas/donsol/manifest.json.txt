@@ -1,0 +1,17 @@
+{
+  "name": "Cambios Chacaltaya Donsol",
+  "short_name": "DONSOL",
+  "description": "Sistema de multicotización",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#2c3e50",
+  "theme_color": "#2c3e50",
+  "icons": [
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

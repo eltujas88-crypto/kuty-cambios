@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CAMBIOS CHACALTAYA - SISTEMA MULTICOTIZACIÓN</title>
+    <!-- PWA CONFIGURACIÓN -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DONSOL">
+    <link rel="apple-touch-icon" href="icon-152x152.png">
+    <meta name="theme-color" content="#2c3e50">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+
+        body {
+            background: #f0f0f0;
+            padding: 8px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            touch-action: pan-y pinch-zoom;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .control-global {
+            background: #2c3e50;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .control-inputs {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .control-input-group label {
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .control-input-group input {
+            width: 70px;
+            padding: 5px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            background: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .boton-desplegar-puntos {
+            background: #FFD700;
+            color: #2c3e50;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 11px;
+            width: 180px;
+            align-self: center;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .boton-desplegar-puntos span {
+            font-size: 12px;
+        }
+
+        .control-puntos {
+            background: #34495e;
+            border-radius: 5px;
+            padding: 8px;
+            margin-top: 5px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .control-puntos.visible {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .puntos-titulo {
+            text-align: center;
+            color: #FFD700;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .puntos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .boton-resetear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .puntos-filas {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .punto-fila {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .punto-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 140px;
+        }
+
+        .punto-casa {
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .punto-base {
+            font-size: 8px;
+            color: #FFD700;
+            margin-top: 1px;
+        }
+
+        .punto-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .punto-valor {
+            font-size: 11px;
+            font-weight: bold;
+            color: #FFD700;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .punto-btn {
+            background: #FFD700;
+            color: #2c3e50;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .punto-btn:active {
+            transform: scale(0.9);
+        }
+
+        .boton-actualizar {
+            background: #FFD700;
+            color: #2c3e50;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 11px;
+            width: 140px;
+            align-self: center;
+            margin-top: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pestanas-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            gap: 5px;
+        }
+
+        .pestana {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+            max-width: 200px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pestana.activa {
+            background: linear-gradient(135deg, #118F00, #1AB300);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .pestana:not(.activa) {
+            background: #34495e;
+            opacity: 0.8;
+        }
+
+        .pestana:hover:not(.activa) {
+            opacity: 1;
+            background: #3d566e;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            transform-origin: top center;
+            transition: transform 0.1s ease-out;
+        }
+
+        .contenido-pestana {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .contenido-pestana.activa {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .grid-dos-columnas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            padding: 5px;
+            min-width: 0;
+        }
+
+        .columna-direccion {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .container {
+            background: white;
+            border: 2px solid #000;
+            padding: 6px;
+            border-radius: 5px;
+            width: 100%;
+            min-width: 0;
+            font-size: 90%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 6px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .contenedor-titulo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+        }
+
+        .titulo {
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .fecha {
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .depositar-fila {
+            background: #d9d9d9;
+            border: 1px solid #000;
+            padding: 4px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 6px;
+            border-radius: 3px;
+            line-height: 1.2;
+        }
+
+        .depositar-monto {
+            font-weight: bold;
+            color: #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+
+        .tabla-principal td {
+            border: 1px solid #000;
+            padding: 3px 2px;
+            font-size: 10px;
+            font-weight: bold;
+            vertical-align: middle;
+            height: 20px;
+        }
+
+        .titulo-seccion {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .fila-bolivianos, .fila-soles {
+            background: #FAFAD2;
+        }
+
+        .tipo-cambio-cell {
+            text-align: center;
+        }
+
+        .monto {
+            text-align: right;
+            padding-right: 4px;
+        }
+
+        .tipo-cambio-label {
+            font-size: 8px;
+            margin-bottom: 1px;
+        }
+
+        .tipo-cambio-valor {
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .input-campo {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: right;
+            outline: none;
+            padding: 1px;
+            color: #000;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .nota {
+            background: #ff0000;
+            color: white;
+            padding: 3px 4px;
+            text-align: center;
+            font-size: 8px;
+            font-weight: bold;
+            line-height: 1.2;
+            border: 1px solid #000;
+            margin-top: 6px;
+            border-radius: 3px;
+        }
+
+        .celda-vacia {
+            border: none;
+        }
+
+        .tabla-3 .input-campo,
+        .tabla-3 .tipo-cambio-label,
+        .tabla-3 .tipo-cambio-valor,
+        .tabla-3 .titulo-seccion,
+        .tabla-3 td:not(.celda-vacia),
+        .tabla-6 .input-campo,
+        .tabla-6 .tipo-cambio-label,
+        .tabla-6 .tipo-cambio-valor,
+        .tabla-6 .titulo-seccion,
+        .tabla-6 td:not(.celda-vacia) {
+            font-weight: 900 !important;
+        }
+
+        .tabla-3 .depositar-fila,
+        .tabla-3 .depositar-monto,
+        .tabla-3 .nota,
+        .tabla-6 .depositar-fila,
+        .tabla-6 .depositar-monto,
+        .tabla-6 .nota {
+            font-weight: 900 !important;
+        }
+
+        .tabla-3 .titulo,
+        .tabla-3 .fecha,
+        .tabla-6 .titulo,
+        .tabla-6 .fecha {
+            font-weight: 900 !important;
+        }
+
+        .chacaltaya-donsol-container {
+            background: white;
+            border: 2px solid #000000 !important;
+            padding: 0;
+            border-radius: 5px;
+            width: 100%;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+            font-size: 90%;
+        }
+        
+        .chacaltaya-donsol-header {
+            background: linear-gradient(135deg, #118F00 0%, #15A300 25%, #1AB300 50%, #15A300 75%, #118F00 100%);
+            box-shadow: 0 4px 15px rgba(17, 143, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #000000 !important;
+            padding: 5px 6px;
+            border-radius: 4px 4px 0 0;
+            text-align: center;
+            margin-bottom: 0;
+        }
+        
+        .chacaltaya-donsol-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 200, 0.6) 2px, transparent 3px),
+                radial-gradient(circle at 40% 70%, rgba(255, 255, 200, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 60% 20%, rgba(255, 255, 200, 0.8) 2px, transparent 3px),
+                radial-gradient(circle at 80% 50%, rgba(255, 255, 200, 0.6) 1px, transparent 2px),
+                radial-gradient(circle at 30% 80%, rgba(255, 255, 200, 0.7) 2px, transparent 3px),
+                radial-gradient(circle at 70% 40%, rgba(255, 255, 200, 0.8) 1px, transparent 2px);
+            background-size: 100px 100px;
+            animation: sparkle 4s infinite linear;
+            opacity: 0.3;
+        }
+        
+        @keyframes sparkle {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+        
+        .chacaltaya-donsol-titulo {
+            font-size: 11px;
+            font-weight: bold;
+            color: #FFFFFF !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+        
+        .chacaltaya-donsol-fecha {
+            font-size: 9px;
+            font-weight: bold;
+            color: #FFFFFF !important;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .chacaltaya-donsol-subtitle {
+            font-size: 10px;
+            font-weight: 900 !important;
+            color: #000000 !important;
+            position: relative;
+            z-index: 1;
+            margin-top: 1px;
+            line-height: 1.2;
+        }
+        
+        .chacaltaya-donsol-table-container {
+            background: #FFFFFF !important;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #000000 !important;
+            border-top: none;
+            padding: 0 !important;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .chacaltaya-donsol-input {
+            background: transparent !important;
+            color: #000000 !important;
+            border: none !important;
+            border-radius: 0;
+            padding: 0 !important;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 900 !important;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            margin: 0;
+            height: 24px !important;
+            line-height: 24px !important;
+            display: block !important;
+        }
+        
+        .chacaltaya-donsol-input:focus {
+            outline: 1px solid #000000;
+            background: #FFFFFF !important;
+        }
+        
+        .chacaltaya-donsol-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            margin: 0;
+        }
+        
+        .chacaltaya-donsol-table th, .chacaltaya-donsol-table td {
+            padding: 0 !important;
+            text-align: center;
+            position: relative;
+            font-size: 10px;
+            font-weight: 900 !important;
+            border: 1px solid #000000 !important;
+            margin: 0;
+            height: 26px !important;
+            line-height: 26px !important;
+            vertical-align: middle !important;
+        }
+        
+        .chacaltaya-donsol-table th {
+            background: linear-gradient(135deg, rgba(17, 143, 0, 0.9), rgba(26, 179, 0, 0.9));
+            color: #FFFFFF;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            border-bottom: 2px solid #000000 !important;
+            font-weight: 900;
+            padding: 0 !important;
+            height: 26px !important;
+            line-height: 26px !important;
+        }
+        
+        .chacaltaya-donsol-table td {
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            font-weight: 900 !important;
+            height: 26px !important;
+            line-height: 26px !important;
+        }
+        
+        .chacaltaya-donsol-table tr:hover td {
+            background: #FFFFFF !important;
+        }
+        
+        .chacaltaya-donsol-tc-cell {
+            background: #FFFFFF !important;
+            border: 1px solid #000000 !important;
+            padding: 0 !important;
+            margin: 0;
+            height: 26px !important;
+            line-height: 26px !important;
+        }
+        
+        .chacaltaya-donsol-tc-value {
+            font-size: 11px !important;
+            font-weight: 900 !important;
+            color: #000000 !important;
+            display: block !important;
+            height: 26px !important;
+            line-height: 26px !important;
+            width: 100%;
+        }
+        
+        .chacaltaya-donsol-depositar {
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            border: 1px solid #000000 !important;
+            border-top: none !important;
+            padding: 3px 4px !important;
+            font-size: 10px;
+            font-weight: 900 !important;
+            text-align: center;
+            margin-top: 0 !important;
+            border-radius: 0;
+            line-height: 1.2;
+        }
+        
+        .chacaltaya-donsol-depositar-monto {
+            font-weight: 900 !important;
+            color: #000000 !important;
+        }
+        
+        .chacaltaya-donsol-nota {
+            background: #D3D3D3;
+            color: #000000 !important;
+            padding: 3px 4px;
+            text-align: center;
+            font-size: 8px;
+            font-weight: normal !important;
+            line-height: 1.2;
+            border: 1px solid #B0B0B0;
+            margin-top: 0 !important;
+            border-radius: 0 0 3px 3px;
+        }
+
+        .donsol-container {
+            background: white;
+            border: 2px solid #000;
+            padding: 0;
+            border-radius: 5px;
+            width: 100%;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+            font-size: 90%;
+        }
+        
+        .donsol-header {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 25%, #996515 50%, #8B6914 75%, #654321 100%);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #FFD700;
+            padding: 6px;
+            border-radius: 4px 4px 0 0;
+            text-align: center;
+            margin-bottom: 0;
+        }
+        
+        .donsol-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 200, 0.6) 2px, transparent 3px),
+                radial-gradient(circle at 40% 70%, rgba(255, 255, 200, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 60% 20%, rgba(255, 255, 200, 0.8) 2px, transparent 3px),
+                radial-gradient(circle at 80% 50%, rgba(255, 255, 200, 0.6) 1px, transparent 2px),
+                radial-gradient(circle at 30% 80%, rgba(255, 255, 200, 0.7) 2px, transparent 3px),
+                radial-gradient(circle at 70% 40%, rgba(255, 255, 200, 0.8) 1px, transparent 2px);
+            background-size: 100px 100px;
+            animation: sparkle 4s infinite linear;
+            opacity: 0.6;
+        }
+        
+        .donsol-titulo {
+            font-size: 11px;
+            font-weight: bold;
+            color: #FFFFFF !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+        
+        .donsol-fecha {
+            font-size: 9px;
+            font-weight: bold;
+            color: #FFFFFF !important;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .donsol-subtitle {
+            font-size: 10px;
+            font-weight: bold;
+            color: #FFFFFF !important;
+            position: relative;
+            z-index: 1;
+            margin-top: 1px;
+            line-height: 1.2;
+        }
+        
+        .donsol-table-container {
+            background: #171a4a;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #FFD700;
+            border-top: none;
+            padding: 6px;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .donsol-input {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 3px;
+            padding: 0 !important;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            height: 24px !important;
+            line-height: 24px !important;
+            display: block !important;
+        }
+        
+        .donsol-input:focus {
+            border-color: #FFD700;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+            outline: none;
+        }
+        
+        .donsol-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+        
+        .donsol-table th, .donsol-table td {
+            padding: 0 !important;
+            text-align: center;
+            position: relative;
+            font-size: 10px;
+            font-weight: bold;
+            height: 28px !important;
+            line-height: 28px !important;
+            vertical-align: middle !important;
+        }
+        
+        .donsol-table th:not(:last-child)::after,
+        .donsol-table td:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: linear-gradient(to bottom, 
+                transparent, 
+                rgba(255, 215, 0, 0.6), 
+                rgba(255, 215, 0, 0.8), 
+                rgba(255, 215, 0, 0.6), 
+                transparent);
+        }
+        
+        .donsol-table tr:first-child th {
+            border-bottom: 2px solid rgba(255, 215, 0, 0.5);
+            padding-bottom: 0 !important;
+        }
+        
+        .donsol-nota {
+            background: #ff0000;
+            color: white;
+            padding: 3px 4px;
+            text-align: center;
+            font-size: 8px;
+            font-weight: bold;
+            line-height: 1.2;
+            border: 1px solid #000;
+            margin-top: 6px;
+            border-radius: 3px;
+        }
+
+        #tipoCambio-donsol-1,
+        #tipoCambio-donsol-2 {
+            background: transparent !important;
+            color: white !important;
+            border: 1px solid rgba(255, 215, 0, 0.4) !important;
+            text-align: center !important;
+            width: 100% !important;
+            height: 24px !important;
+            line-height: 24px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: block !important;
+        }
+
+        #bolivianos-donsol-1,
+        #totalSoles-donsol-1,
+        #soles-donsol-2,
+        #totalBolivianos-donsol-2 {
+            background: transparent !important;
+            color: white !important;
+            border: 1px solid rgba(255, 215, 0, 0.4) !important;
+            text-align: center !important;
+            width: 100% !important;
+            height: 24px !important;
+            line-height: 24px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: block !important;
+        }
+
+        .tabla-2 .tipo-cambio-label,
+        .tabla-5 .tipo-cambio-label {
+            line-height: 1 !important;
+            margin-bottom: 0 !important;
+            font-size: 8px !important;
+            display: block !important;
+        }
+
+        .tabla-1 .header { background: #118F00; }
+        .tabla-1 .titulo { color: #FFFFFF; }
+        .tabla-1 .fecha { color: #FFFFFF; }
+        .tabla-1 .titulo-seccion { background: #1AB300; color: #FFFFFF; }
+        .tabla-1 .tipo-cambio-cell { background: #1AB300; }
+        .tabla-1 .tipo-cambio-label { color: #FFFFFF; }
+        .tabla-1 .tipo-cambio-valor { color: #FFFFFF; }
+
+        .tabla-2 .header { background: #000000; }
+        .tabla-2 .titulo { color: #FFD700; }
+        .tabla-2 .fecha { color: #FFFFFF; }
+        .tabla-2 .titulo-seccion { background: #1AB300; color: #FFFFFF; }
+        .tabla-2 .tipo-cambio-cell { background: #1AB300; }
+        .tabla-2 .tipo-cambio-label { color: #FFFFFF; }
+        .tabla-2 .tipo-cambio-valor { color: #FFFFFF; }
+
+        .tabla-3 .header { background: #002147; }
+        .tabla-3 .titulo { color: #FFFFFF; }
+        .tabla-3 .fecha { color: #FFFFFF; }
+        .tabla-3 .titulo-seccion { background: #002147; color: #FFFFFF; }
+        .tabla-3 .tipo-cambio-cell { background: #002147; }
+        .tabla-3 .tipo-cambio-label { color: #FFFFFF; }
+        .tabla-3 .tipo-cambio-valor { color: #FFFFFF; }
+
+        .tabla-4 .header { background: #118F00; }
+        .tabla-4 .titulo { color: #FFFFFF; }
+        .tabla-4 .fecha { color: #FFFFFF; }
+        .tabla-4 .titulo-seccion { background: #1AB300; color: #FFFFFF; }
+        .tabla-4 .tipo-cambio-cell { background: #1AB300; }
+        .tabla-4 .tipo-cambio-label { color: #FFFFFF; }
+        .tabla-4 .tipo-cambio-valor { color: #FFFFFF; }
+
+        .tabla-5 .header { background: #000000; }
+        .tabla-5 .titulo { color: #FFD700; }
+        .tabla-5 .fecha { color: #FFFFFF; }
+        .tabla-5 .titulo-seccion { background: #1AB300; color: #FFFFFF; }
+        .tabla-5 .tipo-cambio-cell { background: #1AB300; }
+        .tabla-5 .tipo-cambio-label { color: #FFFFFF; }
+        .tabla-5 .tipo-cambio-valor { color: #FFFFFF; }
+
+        .tabla-6 .header { background: #002147; }
+        .tabla-6 .titulo { color: #FFFFFF; }
+        .tabla-6 .fecha { color: #FFFFFF; }
+        .tabla-6 .titulo-seccion { background: #002147; color: #FFFFFF; }
+        .tabla-6 .tipo-cambio-cell { background: #002147; }
+        .tabla-6 .tipo-cambio-label { color: #FFFFFF; }
+        .tabla-6 .tipo-cambio-valor { color: #FFFFFF; }
+
+        .tabla-2 .tipo-cambio-valor,
+        .tabla-5 .tipo-cambio-valor,
+        .tabla-3 .tipo-cambio-valor,
+        .tabla-6 .tipo-cambio-valor {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 24px !important;
+            line-height: 24px !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        .tabla-2 .input-campo,
+        .tabla-5 .input-campo,
+        .tabla-3 .input-campo,
+        .tabla-6 .input-campo {
+            text-align: center !important;
+            padding: 0 !important;
+            height: 24px !important;
+            line-height: 24px !important;
+            display: block !important;
+        }
+
+        .tabla-2 td,
+        .tabla-5 td,
+        .tabla-3 td,
+        .tabla-6 td {
+            vertical-align: middle !important;
+            text-align: center !important;
+            padding: 0 2px !important;
+            height: 26px !important;
+            line-height: 26px !important;
+        }
+
+        .tabla-2 .tipo-cambio-cell,
+        .tabla-5 .tipo-cambio-cell,
+        .tabla-3 .tipo-cambio-cell,
+        .tabla-6 .tipo-cambio-cell {
+            padding: 0 !important;
+            height: 26px !important;
+            line-height: 26px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .tabla-2 .monto,
+        .tabla-5 .monto,
+        .tabla-3 .monto,
+        .tabla-6 .monto {
+            text-align: center !important;
+            padding-right: 0 !important;
+        }
+
+        .boton-reset-zoom {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background: #2c3e50;
+            color: white;
+            border: 2px solid #FFD700;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .boton-reset-zoom.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .boton-reset-zoom:active {
+            transform: scale(0.9);
+        }
+
+        .indicador-zoom {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+
+        .indicador-zoom.visible {
+            display: block;
+        }
+
+        .btn-guardar-imagen {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+            width: 100%;
+            transition: background 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-guardar-imagen:hover {
+            background: #2980b9;
+        }
+
+        .btn-guardar-imagen:active {
+            transform: scale(0.98);
+        }
+
+        .tabla-con-boton {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .grid-dos-columnas {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .columna-direccion {
+                gap: 8px;
+            }
+            
+            .pestanas-container {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .pestana {
+                max-width: none;
+                border-radius: 8px;
+                padding: 8px;
+            }
+            
+            .pestana.activa {
+                border-radius: 8px;
+            }
+            
+            .control-inputs {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .control-input-group input {
+                width: 100%;
+                max-width: 120px;
+            }
+            
+            .punto-fila {
+                flex-direction: column;
+                gap: 4px;
+                align-items: flex-start;
+            }
+            
+            .punto-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .titulo {
+                font-size: 10px;
+            }
+            
+            .fecha {
+                font-size: 8px;
+            }
+            
+            .chacaltaya-donsol-titulo {
+                font-size: 10px;
+            }
+            
+            .chacaltaya-donsol-fecha {
+                font-size: 8px;
+            }
+            
+            .chacaltaya-donsol-subtitle {
+                font-size: 9px;
+            }
+            
+            .chacaltaya-donsol-table th, .chacaltaya-donsol-table td {
+                padding: 0 !important;
+                font-size: 9px;
+                height: 24px !important;
+                line-height: 24px !important;
+            }
+            
+            .chacaltaya-donsol-input {
+                padding: 0 !important;
+                font-size: 9px;
+                height: 22px !important;
+                line-height: 22px !important;
+            }
+            
+            .chacaltaya-donsol-tc-value {
+                font-size: 10px !important;
+                height: 24px !important;
+                line-height: 24px !important;
+            }
+            
+            .donsol-titulo {
+                font-size: 10px;
+            }
+            
+            .donsol-fecha {
+                font-size: 8px;
+            }
+            
+            .donsol-subtitle {
+                font-size: 9px;
+            }
+            
+            .donsol-table th, .donsol-table td {
+                padding: 0 !important;
+                font-size: 9px;
+                height: 26px !important;
+                line-height: 26px !important;
+            }
+            
+            .donsol-input,
+            #tipoCambio-donsol-1,
+            #tipoCambio-donsol-2,
+            #bolivianos-donsol-1,
+            #totalSoles-donsol-1,
+            #soles-donsol-2,
+            #totalBolivianos-donsol-2 {
+                width: 100% !important;
+                padding: 0 !important;
+                font-size: 9px;
+                height: 22px !important;
+                line-height: 22px !important;
+            }
+            
+            .punto-info {
+                min-width: 100px;
+            }
+            
+            .boton-desplegar-puntos {
+                width: 160px;
+                font-size: 10px;
+            }
+            
+            .boton-reset-zoom {
+                bottom: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .grid-dos-columnas {
+                gap: 20px;
+            }
+            
+            .columna-direccion {
+                gap: 15px;
+            }
+            
+            .container {
+                padding: 8px;
+            }
+            
+            .titulo {
+                font-size: 13px;
+            }
+            
+            .fecha {
+                font-size: 10px;
+            }
+            
+            .chacaltaya-donsol-titulo {
+                font-size: 13px;
+            }
+            
+            .chacaltaya-donsol-fecha {
+                font-size: 10px;
+            }
+            
+            .chacaltaya-donsol-subtitle {
+                font-size: 11px;
+            }
+            
+            .chacaltaya-donsol-table th, .chacaltaya-donsol-table td {
+                padding: 0 !important;
+                font-size: 11px;
+                height: 28px !important;
+                line-height: 28px !important;
+            }
+            
+            .chacaltaya-donsol-input {
+                padding: 0 !important;
+                font-size: 11px;
+                height: 26px !important;
+                line-height: 26px !important;
+            }
+            
+            .chacaltaya-donsol-tc-value {
+                font-size: 12px !important;
+                height: 28px !important;
+                line-height: 28px !important;
+            }
+            
+            .donsol-titulo {
+                font-size: 13px;
+            }
+            
+            .donsol-fecha {
+                font-size: 10px;
+            }
+            
+            .donsol-subtitle {
+                font-size: 11px;
+            }
+            
+            .donsol-table th, .donsol-table td {
+                padding: 0 !important;
+                font-size: 11px;
+                height: 30px !important;
+                line-height: 30px !important;
+            }
+            
+            .donsol-input,
+            #tipoCambio-donsol-1,
+            #tipoCambio-donsol-2,
+            #bolivianos-donsol-1,
+            #totalSoles-donsol-1,
+            #soles-donsol-2,
+            #totalBolivianos-donsol-2 {
+                width: 100% !important;
+                padding: 0 !important;
+                font-size: 11px;
+                height: 26px !important;
+                line-height: 26px !important;
+            }
+        }
+    </style>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function(registration) {
+                    console.log('ServiceWorker registrado con éxito:', registration.scope);
+                }, function(err) {
+                    console.log('Error al registrar ServiceWorker:', err);
+                });
+            });
+        }
+    </script>
+    <script>
+        let puntosVisible = false;
+        let ultimaActividad = Date.now();
+        let timerReset = null;
+        let zoomScale = 1;
+        let isZooming = false;
+        let startDistance = 0;
+        const TIEMPO_RESET = 10000;
+        const MIN_ZOOM = 1;
+        const MAX_ZOOM = 3;
+        
+        const puntosBasePredeterminados = {
+            'chacaltaya': 0.04,
+            'kollita': 0.03,
+            'lunita': 0.03,
+            'donsol': 0.02
+        };
+        
+        let puntosExtraActuales = {
+            'chacaltaya': 0.00,
+            'kollita': 0.00,
+            'lunita': 0.00,
+            'donsol': 0.00
+        };
+
+        let donsol1TC = 3.87;
+        let donsol2TC = 3.82;
+
+        function guardarTablaComoImagen(idTabla) {
+            const elemento = document.getElementById(idTabla);
+            if (!elemento) return;
+            
+            const zoomActual = zoomScale;
+            const contenedorPrincipal = document.getElementById('contenedor-principal');
+            
+            const originalTransform = contenedorPrincipal.style.transform;
+            const originalOrigin = contenedorPrincipal.style.transformOrigin;
+            
+            const scrollY = window.scrollY;
+            
+            contenedorPrincipal.style.transform = 'none';
+            contenedorPrincipal.style.transformOrigin = 'unset';
+            
+            elemento.scrollIntoView({ behavior: 'auto', block: 'center' });
+            
+            setTimeout(() => {
+                html2canvas(elemento, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    allowTaint: true,
+                    useCORS: true
+                }).then(canvas => {
+                    const enlace = document.createElement('a');
+                    enlace.download = `tabla-${idTabla}-${new Date().toISOString().slice(0,10)}.png`;
+                    enlace.href = canvas.toDataURL('image/png');
+                    enlace.click();
+                    
+                    contenedorPrincipal.style.transform = originalTransform;
+                    contenedorPrincipal.style.transformOrigin = originalOrigin;
+                    window.scrollTo(0, scrollY);
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al generar la imagen');
+                    contenedorPrincipal.style.transform = originalTransform;
+                    contenedorPrincipal.style.transformOrigin = originalOrigin;
+                    window.scrollTo(0, scrollY);
+                });
+            }, 300);
+        }
+
+        function cambiarPestana(pestanaId) {
+            document.querySelectorAll('.pestana').forEach(pestana => {
+                pestana.classList.remove('activa');
+            });
+            
+            document.querySelectorAll('.contenido-pestana').forEach(contenido => {
+                contenido.classList.remove('activa');
+            });
+            
+            const pestana = document.querySelector(`[onclick="cambiarPestana('${pestanaId}')"]`);
+            if (pestana) {
+                pestana.classList.add('activa');
+            }
+            
+            const contenido = document.getElementById(`pestana-${pestanaId}`);
+            if (contenido) {
+                contenido.classList.add('activa');
+            }
+            
+            registrarActividad();
+        }
+
+        function inicializarZoom() {
+            const contenedor = document.getElementById('contenedor-principal');
+            
+            contenedor.addEventListener('touchstart', (e) => {
+                registrarActividad();
+                if (e.touches.length === 2) {
+                    isZooming = true;
+                    startDistance = getTouchDistance(e.touches[0], e.touches[1]);
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            contenedor.addEventListener('touchmove', (e) => {
+                if (isZooming && e.touches.length === 2) {
+                    const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+                    const scaleChange = currentDistance / startDistance;
+                    
+                    zoomScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomScale * scaleChange));
+                    aplicarZoom();
+                    
+                    startDistance = currentDistance;
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            contenedor.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    isZooming = false;
+                    mostrarBotonReset();
+                }
+            });
+            
+            contenedor.addEventListener('wheel', (e) => {
+                registrarActividad();
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    
+                    if (e.deltaY < 0) {
+                        zoomScale = Math.min(MAX_ZOOM, zoomScale + 0.1);
+                    } else {
+                        zoomScale = Math.max(MIN_ZOOM, zoomScale - 0.1);
+                    }
+                    
+                    aplicarZoom();
+                    mostrarBotonReset();
+                }
+            }, { passive: false });
+            
+            contenedor.addEventListener('dblclick', (e) => {
+                registrarActividad();
+                resetZoom();
+            });
+        }
+        
+        function getTouchDistance(touch1, touch2) {
+            const dx = touch1.clientX - touch2.clientX;
+            const dy = touch1.clientY - touch2.clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        function aplicarZoom() {
+            const contenedor = document.getElementById('contenedor-principal');
+            const indicadorZoom = document.getElementById('indicador-zoom');
+            
+            contenedor.style.transform = `scale(${zoomScale})`;
+            contenedor.style.transformOrigin = 'top center';
+            
+            indicadorZoom.textContent = `${Math.round(zoomScale * 100)}%`;
+            indicadorZoom.classList.add('visible');
+            
+            setTimeout(() => {
+                indicadorZoom.classList.remove('visible');
+            }, 2000);
+        }
+        
+        function resetZoom() {
+            zoomScale = 1;
+            aplicarZoom();
+            document.getElementById('boton-reset-zoom').classList.remove('visible');
+        }
+        
+        function mostrarBotonReset() {
+            if (zoomScale > 1.1) {
+                document.getElementById('boton-reset-zoom').classList.add('visible');
+            } else {
+                document.getElementById('boton-reset-zoom').classList.remove('visible');
+            }
+        }
+
+        function registrarActividad() {
+            ultimaActividad = Date.now();
+            clearTimeout(timerReset);
+            timerReset = setTimeout(resetearMontos, TIEMPO_RESET);
+        }
+
+        function resetearMontos() {
+            document.querySelectorAll('.input-campo, .chacaltaya-donsol-input').forEach(input => {
+                input.value = '';
+            });
+            
+            document.getElementById('bolivianos-donsol-1').value = '';
+            document.getElementById('totalSoles-donsol-1').value = '';
+            document.getElementById('soles-donsol-2').value = '';
+            document.getElementById('totalBolivianos-donsol-2').value = '';
+            
+            document.getElementById('tipoCambio-donsol-1').value = donsol1TC.toFixed(2);
+            document.getElementById('tipoCambio-donsol-2').value = donsol2TC.toFixed(2);
+            
+            document.querySelectorAll('.depositar-monto, .chacaltaya-donsol-depositar-monto, #depositar-bs-donsol-1, #depositar-soles-donsol-1, #depositar-soles-donsol-2, #depositar-bs-donsol-2').forEach(display => {
+                display.textContent = '0';
+            });
+        }
+
+        function inicializarMonitoreoActividad() {
+            document.addEventListener('input', registrarActividad);
+            document.addEventListener('click', registrarActividad);
+            document.addEventListener('keydown', registrarActividad);
+            document.addEventListener('scroll', registrarActividad);
+            
+            timerReset = setTimeout(resetearMontos, TIEMPO_RESET);
+        }
+
+        function togglePuntos() {
+            const controlPuntos = document.getElementById('control-puntos');
+            const boton = document.querySelector('.boton-desplegar-puntos');
+            const flecha = boton.querySelector('span');
+            
+            puntosVisible = !puntosVisible;
+            registrarActividad();
+            
+            if (puntosVisible) {
+                controlPuntos.classList.add('visible');
+                flecha.textContent = '▲';
+                boton.style.marginBottom = '8px';
+            } else {
+                controlPuntos.classList.remove('visible');
+                flecha.textContent = '▼';
+                boton.style.marginBottom = '0';
+            }
+        }
+
+        function guardarDatos() {
+            const pestanaActiva = document.querySelector('.pestana.activa')?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1] || 'bs-soles';
+            
+            donsol1TC = parseFloat(document.getElementById('tipoCambio-donsol-1').value) || 3.87;
+            donsol2TC = parseFloat(document.getElementById('tipoCambio-donsol-2').value) || 3.82;
+            
+            const datos = {
+                tipoCambioCol1: document.getElementById('tc-columna-1').value,
+                tipoCambioCol2: document.getElementById('tc-columna-2').value,
+                puntosExtra: puntosExtraActuales,
+                puntosVisible: puntosVisible,
+                zoomScale: zoomScale,
+                pestanaActiva: pestanaActiva,
+                donsol1TC: donsol1TC,
+                donsol2TC: donsol2TC
+            };
+            localStorage.setItem('sistemaCotizaciones', JSON.stringify(datos));
+        }
+
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem('sistemaCotizaciones');
+            if (datosGuardados) {
+                const datos = JSON.parse(datosGuardados);
+                
+                document.getElementById('tc-columna-1').value = datos.tipoCambioCol1 || 3.87;
+                document.getElementById('tc-columna-2').value = datos.tipoCambioCol2 || 3.82;
+                
+                if (datos.puntosExtra) {
+                    puntosExtraActuales = {...datos.puntosExtra};
+                    for (const casa in puntosExtraActuales) {
+                        const el = document.getElementById(`punto-${casa}`);
+                        if (el) el.textContent = puntosExtraActuales[casa].toFixed(2);
+                    }
+                }
+                
+                if (datos.donsol1TC) {
+                    donsol1TC = datos.donsol1TC;
+                    document.getElementById('tipoCambio-donsol-1').value = donsol1TC.toFixed(2);
+                }
+                
+                if (datos.donsol2TC) {
+                    donsol2TC = datos.donsol2TC;
+                    document.getElementById('tipoCambio-donsol-2').value = donsol2TC.toFixed(2);
+                }
+                
+                if (datos.puntosVisible) {
+                    setTimeout(() => togglePuntos(), 100);
+                }
+                
+                if (datos.zoomScale) {
+                    zoomScale = datos.zoomScale;
+                    aplicarZoom();
+                }
+                
+                if (datos.pestanaActiva) {
+                    setTimeout(() => cambiarPestana(datos.pestanaActiva), 200);
+                }
+                
+                actualizarTodos();
+            }
+        }
+        
+        function ajustarPunto(casa, cambio) {
+            registrarActividad();
+            
+            puntosExtraActuales[casa] = parseFloat((puntosExtraActuales[casa] + cambio).toFixed(2));
+            
+            if (puntosExtraActuales[casa] < 0) puntosExtraActuales[casa] = 0;
+            if (puntosExtraActuales[casa] > 1.00) puntosExtraActuales[casa] = 1.00;
+            
+            document.getElementById(`punto-${casa}`).textContent = puntosExtraActuales[casa].toFixed(2);
+            actualizarTodos();
+            guardarDatos();
+        }
+        
+        function resetearPuntos() {
+            registrarActividad();
+            
+            puntosExtraActuales = {
+                'chacaltaya': 0.00,
+                'kollita': 0.00,
+                'lunita': 0.00,
+                'donsol': 0.00
+            };
+            
+            for (const casa in puntosExtraActuales) {
+                document.getElementById(`punto-${casa}`).textContent = '0.00';
+            }
+            
+            actualizarTodos();
+            guardarDatos();
+        }
+        
+        function actualizarTodos() {
+            registrarActividad();
+            
+            const tipoCambioBSaSoles = parseFloat(document.getElementById('tc-columna-1').value) || 0;
+            const tipoCambioSolesaBS = parseFloat(document.getElementById('tc-columna-2').value) || 0;
+            
+            if (tipoCambioBSaSoles > 0) {
+                actualizarTablaChacaltayaDonsol('bs-soles', tipoCambioBSaSoles, true);
+                actualizarTablaOriginal(2, tipoCambioBSaSoles, true);
+                actualizarTablaOriginal(3, tipoCambioBSaSoles, true);
+                actualizarTipoCambioDonsol1DesdeGlobal();
+            }
+            
+            if (tipoCambioSolesaBS > 0) {
+                actualizarTablaChacaltayaDonsol('soles-bs', tipoCambioSolesaBS, false);
+                actualizarTablaOriginal(5, tipoCambioSolesaBS, false);
+                actualizarTablaOriginal(6, tipoCambioSolesaBS, false);
+                actualizarTipoCambioDonsol2DesdeGlobal();
+            }
+            
+            guardarDatos();
+        }
+
+        function calcularTipoCambioFinal(tipoCambioBase, casa, esBsaSoles) {
+            const puntosBase = puntosBasePredeterminados[casa] || 0;
+            const puntosExtra = puntosExtraActuales[casa] || 0;
+            const ajusteTotal = puntosBase + puntosExtra;
+            
+            return esBsaSoles ? tipoCambioBase + ajusteTotal : tipoCambioBase - ajusteTotal;
+        }
+
+        function actualizarTablaChacaltayaDonsol(pestana, tipoCambioBase, esBsaSoles) {
+            const containers = document.querySelectorAll(`#pestana-${pestana} .chacaltaya-donsol-container`);
+            
+            containers.forEach(container => {
+                const tipoCambioFinal = calcularTipoCambioFinal(tipoCambioBase, 'chacaltaya', esBsaSoles);
+                const tcDisplay = container.querySelector('.tc-display');
+                if (tcDisplay) {
+                    tcDisplay.textContent = tipoCambioFinal.toFixed(2);
+                }
+                
+                recalcularTablaChacaltayaDonsol(container, tipoCambioFinal, esBsaSoles);
+            });
+        }
+
+        function recalcularTablaChacaltayaDonsol(container, tipoCambio, esBsaSoles) {
+            const bsInput = container.querySelector('.bs-input');
+            const solesInput = container.querySelector('.soles-input');
+            const bsDisplay = container.querySelector('.bs-display');
+            const solesDisplay = container.querySelector('.soles-display');
+
+            if (esBsaSoles) {
+                if (bsInput && parseFloat(bsInput.value) > 0) {
+                    const bs = parseFloat(bsInput.value);
+                    const soles = (bs / tipoCambio).toFixed(2);
+                    if (solesInput) solesInput.value = soles;
+                    if (bsDisplay) bsDisplay.textContent = bs.toFixed(2);
+                    if (solesDisplay) solesDisplay.textContent = soles;
+                } else if (solesInput && parseFloat(solesInput.value) > 0) {
+                    const soles = parseFloat(solesInput.value);
+                    const bs = (soles * tipoCambio).toFixed(2);
+                    if (bsInput) bsInput.value = bs;
+                    if (bsDisplay) bsDisplay.textContent = bs;
+                    if (solesDisplay) solesDisplay.textContent = soles;
+                }
+            } else {
+                if (solesInput && parseFloat(solesInput.value) > 0) {
+                    const soles = parseFloat(solesInput.value);
+                    const bs = (soles * tipoCambio).toFixed(2);
+                    if (bsInput) bsInput.value = bs;
+                    if (bsDisplay) bsDisplay.textContent = bs;
+                    if (solesDisplay) solesDisplay.textContent = soles.toFixed(2);
+                } else if (bsInput && parseFloat(bsInput.value) > 0) {
+                    const bs = parseFloat(bsInput.value);
+                    const soles = (bs / tipoCambio).toFixed(2);
+                    if (solesInput) solesInput.value = soles;
+                    if (bsDisplay) bsDisplay.textContent = bs.toFixed(2);
+                    if (solesDisplay) solesDisplay.textContent = soles;
+                }
+            }
+        }
+
+        function actualizarTablaOriginal(numeroTabla, tipoCambioBase, esBsaSoles) {
+            const tablas = document.querySelectorAll(`.tabla-${numeroTabla}`);
+            if (!tablas.length) return;
+            
+            let casa = '';
+            const primeraTabla = tablas[0];
+            const titulo = primeraTabla.querySelector('.titulo').textContent.trim();
+            
+            if (titulo.toLowerCase().includes('kollita')) {
+                casa = 'kollita';
+            } else if (titulo.toLowerCase().includes('lunita')) {
+                casa = 'lunita';
+            }
+            
+            if (!casa) return;
+            
+            const tipoCambioFinal = calcularTipoCambioFinal(tipoCambioBase, casa, esBsaSoles);
+            
+            tablas.forEach(tabla => {
+                const tcDisplays = tabla.querySelectorAll('.tc-display');
+                tcDisplays.forEach(display => {
+                    display.textContent = tipoCambioFinal.toFixed(2);
+                });
+
+                recalcularTablaOriginal(tabla, tipoCambioFinal);
+            });
+        }
+
+        function recalcularTablaOriginal(tabla, tipoCambio) {
+            const bsInput = tabla.querySelector('.bs-input');
+            const solesInput = tabla.querySelector('.soles-input');
+            const bsDisplay = tabla.querySelector('.bs-display');
+            const solesDisplay = tabla.querySelector('.soles-display');
+
+            const bs = parseFloat(bsInput.value) || 0;
+            if (bs > 0) {
+                const soles = (bs / tipoCambio).toFixed(1);
+                solesInput.value = soles;
+                if (bsDisplay) bsDisplay.textContent = bs.toFixed(2);
+                if (solesDisplay) solesDisplay.textContent = soles;
+            } else {
+                const soles = parseFloat(solesInput.value) || 0;
+                if (soles > 0) {
+                    const bs = (soles * tipoCambio).toFixed(2);
+                    bsInput.value = bs;
+                    if (bsDisplay) bsDisplay.textContent = bs;
+                    if (solesDisplay) solesDisplay.textContent = soles.toFixed(1);
+                }
+            }
+        }
+
+        function inicializarTablaOriginal(tabla) {
+            const bsInput = tabla.querySelector('.bs-input');
+            const solesInput = tabla.querySelector('.soles-input');
+            const tcDisplay = tabla.querySelector('.tc-display');
+            const bsDisplay = tabla.querySelector('.bs-display');
+            const solesDisplay = tabla.querySelector('.soles-display');
+
+            let calculandoDesdeBS = false;
+            let calculandoDesdeSoles = false;
+
+            function calcularBSaSoles() {
+                if (calculandoDesdeSoles) return;
+                calculandoDesdeBS = true;
+
+                const bs = parseFloat(bsInput.value) || 0;
+                const tc = parseFloat(tcDisplay.textContent) || 0;
+
+                if (tc > 0) {
+                    const soles = (bs / tc).toFixed(1);
+                    solesInput.value = soles;
+                    if (bsDisplay) bsDisplay.textContent = bs.toFixed(2);
+                    if (solesDisplay) solesDisplay.textContent = soles;
+                }
+
+                setTimeout(() => { calculandoDesdeBS = false; }, 100);
+            }
+
+            function calcularSolesaBS() {
+                if (calculandoDesdeBS) return;
+                calculandoDesdeSoles = true;
+
+                const soles = parseFloat(solesInput.value) || 0;
+                const tc = parseFloat(tcDisplay.textContent) || 0;
+
+                if (tc > 0) {
+                    const bs = (soles * tc).toFixed(2);
+                    bsInput.value = bs;
+                    if (bsDisplay) bsDisplay.textContent = bs;
+                    if (solesDisplay) solesDisplay.textContent = soles.toFixed(1);
+                }
+
+                setTimeout(() => { calculandoDesdeSoles = false; }, 100);
+            }
+
+            if (bsInput) {
+                bsInput.addEventListener('input', () => {
+                    registrarActividad();
+                    calcularBSaSoles();
+                });
+            }
+            if (solesInput) {
+                solesInput.addEventListener('input', () => {
+                    registrarActividad();
+                    calcularSolesaBS();
+                });
+            }
+
+            if (bsInput && bsInput.value && parseFloat(bsInput.value) > 0) {
+                calcularBSaSoles();
+            } else if (solesInput && solesInput.value && parseFloat(solesInput.value) > 0) {
+                calcularSolesaBS();
+            }
+        }
+
+        function inicializarTablaChacaltayaDonsol(container) {
+            const bsInput = container.querySelector('.bs-input');
+            const solesInput = container.querySelector('.soles-input');
+            const tcDisplay = container.querySelector('.tc-display');
+            const bsDisplay = container.querySelector('.bs-display');
+            const solesDisplay = container.querySelector('.soles-display');
+            const subtitle = container.querySelector('.chacaltaya-donsol-subtitle');
+            
+            const esBsaSoles = subtitle && 
+                subtitle.textContent.toLowerCase().includes('bolivianos a soles');
+
+            let calculandoDesdeBS = false;
+            let calculandoDesdeSoles = false;
+
+            function calcularBSaSoles() {
+                if (calculandoDesdeSoles) return;
+                calculandoDesdeBS = true;
+
+                const bs = parseFloat(bsInput.value) || 0;
+                const tc = parseFloat(tcDisplay.textContent) || 0;
+
+                if (tc > 0) {
+                    const soles = (bs / tc).toFixed(2);
+                    if (solesInput) solesInput.value = soles;
+                    if (bsDisplay) bsDisplay.textContent = bs.toFixed(2);
+                    if (solesDisplay) solesDisplay.textContent = soles;
+                }
+
+                setTimeout(() => { calculandoDesdeBS = false; }, 100);
+            }
+
+            function calcularSolesaBS() {
+                if (calculandoDesdeBS) return;
+                calculandoDesdeSoles = true;
+
+                const soles = parseFloat(solesInput.value) || 0;
+                const tc = parseFloat(tcDisplay.textContent) || 0;
+
+                if (tc > 0) {
+                    const bs = (soles * tc).toFixed(2);
+                    if (bsInput) bsInput.value = bs;
+                    if (bsDisplay) bsDisplay.textContent = bs;
+                    if (solesDisplay) solesDisplay.textContent = soles.toFixed(2);
+                }
+
+                setTimeout(() => { calculandoDesdeSoles = false; }, 100);
+            }
+
+            if (bsInput) {
+                bsInput.addEventListener('input', () => {
+                    registrarActividad();
+                    calcularBSaSoles();
+                });
+            }
+            
+            if (solesInput) {
+                solesInput.addEventListener('input', () => {
+                    registrarActividad();
+                    calcularSolesaBS();
+                });
+            }
+            
+            if (esBsaSoles) {
+                if (bsInput && bsInput.value && parseFloat(bsInput.value) > 0) {
+                    calcularBSaSoles();
+                } else if (solesInput && solesInput.value && parseFloat(solesInput.value) > 0) {
+                    calcularSolesaBS();
+                }
+            } else {
+                if (solesInput && solesInput.value && parseFloat(solesInput.value) > 0) {
+                    calcularSolesaBS();
+                } else if (bsInput && bsInput.value && parseFloat(bsInput.value) > 0) {
+                    calcularBSaSoles();
+                }
+            }
+        }
+
+        function calculateFromBolivianosDonsol1() {
+            registrarActividad();
+            const bolivianos = parseFloat(document.getElementById('bolivianos-donsol-1').value) || 0;
+            const tipoCambio = parseFloat(document.getElementById('tipoCambio-donsol-1').value) || 0;
+            if (tipoCambio > 0) {
+                const resultado = (bolivianos / tipoCambio).toFixed(2);
+                document.getElementById('totalSoles-donsol-1').value = resultado;
+                document.getElementById('depositar-bs-donsol-1').textContent = bolivianos.toFixed(2);
+                document.getElementById('depositar-soles-donsol-1').textContent = resultado;
+                donsol1TC = tipoCambio;
+            }
+        }
+
+        function calculateFromSolesDonsol1() {
+            registrarActividad();
+            const totalSoles = parseFloat(document.getElementById('totalSoles-donsol-1').value) || 0;
+            const tipoCambio = parseFloat(document.getElementById('tipoCambio-donsol-1').value) || 0;
+            if (tipoCambio > 0) {
+                const resultado = (totalSoles * tipoCambio).toFixed(2);
+                document.getElementById('bolivianos-donsol-1').value = resultado;
+                document.getElementById('depositar-bs-donsol-1').textContent = resultado;
+                document.getElementById('depositar-soles-donsol-1').textContent = totalSoles.toFixed(2);
+                donsol1TC = tipoCambio;
+            }
+        }
+
+        function updateTipoCambioDonsol1() {
+            registrarActividad();
+            calculateFromBolivianosDonsol1();
+        }
+        
+        function actualizarTipoCambioDonsol1DesdeGlobal() {
+            const tipoCambioBSaSoles = parseFloat(document.getElementById('tc-columna-1').value) || 0;
+            const tipoCambioFinal = calcularTipoCambioFinal(tipoCambioBSaSoles, 'donsol', true);
+            const tcInput = document.getElementById('tipoCambio-donsol-1');
+            if (tcInput) {
+                tcInput.value = tipoCambioFinal.toFixed(2);
+                donsol1TC = tipoCambioFinal;
+                calculateFromBolivianosDonsol1();
+            }
+        }
+
+        function calculateFromSolesDonsol2() {
+            registrarActividad();
+            const soles = parseFloat(document.getElementById('soles-donsol-2').value) || 0;
+            const tipoCambio = parseFloat(document.getElementById('tipoCambio-donsol-2').value) || 0;
+            if (tipoCambio > 0) {
+                const resultado = (soles * tipoCambio).toFixed(2);
+                document.getElementById('totalBolivianos-donsol-2').value = resultado;
+                document.getElementById('depositar-soles-donsol-2').textContent = soles.toFixed(2);
+                document.getElementById('depositar-bs-donsol-2').textContent = resultado;
+                donsol2TC = tipoCambio;
+            }
+        }
+
+        function calculateFromBolivianosDonsol2() {
+            registrarActividad();
+            const totalBolivianos = parseFloat(document.getElementById('totalBolivianos-donsol-2').value) || 0;
+            const tipoCambio = parseFloat(document.getElementById('tipoCambio-donsol-2').value) || 0;
+            if (tipoCambio > 0) {
+                const resultado = (totalBolivianos / tipoCambio).toFixed(2);
+                document.getElementById('soles-donsol-2').value = resultado;
+                document.getElementById('depositar-soles-donsol-2').textContent = resultado;
+                document.getElementById('depositar-bs-donsol-2').textContent = totalBolivianos.toFixed(2);
+                donsol2TC = tipoCambio;
+            }
+        }
+
+        function updateTipoCambioDonsol2() {
+            registrarActividad();
+            calculateFromSolesDonsol2();
+        }
+        
+        function actualizarTipoCambioDonsol2DesdeGlobal() {
+            const tipoCambioSolesaBS = parseFloat(document.getElementById('tc-columna-2').value) || 0;
+            const tipoCambioFinal = calcularTipoCambioFinal(tipoCambioSolesaBS, 'donsol', false);
+            const tcInput = document.getElementById('tipoCambio-donsol-2');
+            if (tcInput) {
+                tcInput.value = tipoCambioFinal.toFixed(2);
+                donsol2TC = tipoCambioFinal;
+                calculateFromSolesDonsol2();
+            }
+        }
+
+        function establecerFechas() {
+            const ahora = new Date();
+            const fecha = ahora.toLocaleDateString('es-ES');
+
+            for (let i = 1; i <= 6; i++) {
+                document.querySelectorAll(`#fecha-${i}`).forEach(elemento => {
+                    elemento.textContent = fecha;
+                });
+            }
+            
+            document.getElementById('fecha-donsol-1').textContent = fecha;
+            document.getElementById('fecha-donsol-2').textContent = fecha;
+        }
+
+        function configurarParaAndroid() {
+            document.body.style.userSelect = 'none';
+            document.body.style.webkitUserSelect = 'none';
+            document.body.style.touchAction = 'pan-y pinch-zoom';
+            
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+            
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.select();
+                });
+            });
+        }
+
+        window.onload = function() {
+            establecerFechas();
+            cargarDatos();
+            inicializarMonitoreoActividad();
+            inicializarZoom();
+            configurarParaAndroid();
+
+            document.querySelectorAll('.container').forEach(tabla => {
+                inicializarTablaOriginal(tabla);
+            });
+            
+            document.querySelectorAll('.chacaltaya-donsol-container').forEach(container => {
+                inicializarTablaChacaltayaDonsol(container);
+            });
+            
+            document.getElementById('bolivianos-donsol-1').addEventListener('input', calculateFromBolivianosDonsol1);
+            document.getElementById('tipoCambio-donsol-1').addEventListener('input', updateTipoCambioDonsol1);
+            document.getElementById('totalSoles-donsol-1').addEventListener('input', calculateFromSolesDonsol1);
+            
+            document.getElementById('soles-donsol-2').addEventListener('input', calculateFromSolesDonsol2);
+            document.getElementById('tipoCambio-donsol-2').addEventListener('input', updateTipoCambioDonsol2);
+            document.getElementById('totalBolivianos-donsol-2').addEventListener('input', calculateFromBolivianosDonsol2);
+            
+            calculateFromBolivianosDonsol1();
+            calculateFromSolesDonsol2();
+            
+            actualizarTodos();
+        };
+
+        window.addEventListener('beforeunload', guardarDatos);
+        setInterval(guardarDatos, 30000);
+    </script>
+</head>
+<body>
+<div class="control-global">
+    <div class="control-inputs">
+        <div class="control-input-group">
+            <label>BS → SOLES</label>
+            <input type="number" id="tc-columna-1" value="3.87" step="0.01" min="0" inputmode="decimal">
+        </div>
+        <div class="control-input-group">
+            <label>SOLES → BS</label>
+            <input type="number" id="tc-columna-2" value="3.82" step="0.01" min="0" inputmode="decimal">
+        </div>
+    </div>
+    
+    <button class="boton-desplegar-puntos" onclick="togglePuntos()">
+        <span>▼</span> CONTROL DE PUNTOS EXTRA
+    </button>
+    
+    <div class="control-puntos" id="control-puntos">
+        <div class="puntos-header">
+            <div class="puntos-titulo">PUNTOS EXTRA POR CASA (0.01 = 1%)</div>
+            <button class="boton-resetear" onclick="resetearPuntos()">RESTABLECER</button>
+        </div>
+        <div class="puntos-filas">
+            <div class="punto-fila">
+                <div class="punto-info">
+                    <div class="punto-casa">CAMBIOS CHACALTAYA</div>
+                    <div class="punto-base">Base: +0.04 (+4%)</div>
+                </div>
+                <div class="punto-controls">
+                    <button class="punto-btn" onclick="ajustarPunto('chacaltaya', -0.01)">-</button>
+                    <div class="punto-valor" id="punto-chacaltaya">0.00</div>
+                    <button class="punto-btn" onclick="ajustarPunto('chacaltaya', 0.01)">+</button>
+                </div>
+            </div>
+            <div class="punto-fila">
+                <div class="punto-info">
+                    <div class="punto-casa">KOLLITA EXPRESS</div>
+                    <div class="punto-base">Base: +0.03 (+3%)</div>
+                </div>
+                <div class="punto-controls">
+                    <button class="punto-btn" onclick="ajustarPunto('kollita', -0.01)">-</button>
+                    <div class="punto-valor" id="punto-kollita">0.00</div>
+                    <button class="punto-btn" onclick="ajustarPunto('kollita', 0.01)">+</button>
+                </div>
+            </div>
+            <div class="punto-fila">
+                <div class="punto-info">
+                    <div class="punto-casa">PUNTO LUNITA</div>
+                    <div class="punto-base">Base: +0.03 (+3%)</div>
+                </div>
+                <div class="punto-controls">
+                    <button class="punto-btn" onclick="ajustarPunto('lunita', -0.01)">-</button>
+                    <div class="punto-valor" id="punto-lunita">0.00</div>
+                    <button class="punto-btn" onclick="ajustarPunto('lunita', 0.01)">+</button>
+                </div>
+            </div>
+            <div class="punto-fila">
+                <div class="punto-info">
+                    <div class="punto-casa">CASA DONSOL</div>
+                    <div class="punto-base">Base: +0.02 (+2%)</div>
+                </div>
+                <div class="punto-controls">
+                    <button class="punto-btn" onclick="ajustarPunto('donsol', -0.01)">-</button>
+                    <div class="punto-valor" id="punto-donsol">0.00</div>
+                    <button class="punto-btn" onclick="ajustarPunto('donsol', 0.01)">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="boton-actualizar" onclick="actualizarTodos()">ACTUALIZAR TODOS</button>
+</div>
+
+<div class="pestanas-container">
+    <button class="pestana activa" onclick="cambiarPestana('bs-soles')">
+        BS → SOLES
+    </button>
+    <button class="pestana" onclick="cambiarPestana('soles-bs')">
+        SOLES → BS
+    </button>
+</div>
+
+<div class="indicador-zoom" id="indicador-zoom">100%</div>
+
+<div class="contenedor-principal" id="contenedor-principal">
+    <div class="contenido-pestana activa" id="pestana-bs-soles">
+        <div class="grid-dos-columnas">
+            <div class="columna-direccion">
+                <div class="tabla-con-boton">
+                    <div class="chacaltaya-donsol-container" id="tabla-chacaltaya-bs-soles">
+                        <div class="chacaltaya-donsol-header">
+                            <div class="chacaltaya-donsol-titulo">CAMBIOS CHACALTAYA</div>
+                            <div class="chacaltaya-donsol-fecha" id="fecha-1"></div>
+                            <div class="chacaltaya-donsol-subtitle">BOLIVIANOS A SOLES</div>
+                        </div>
+                        
+                        <div class="chacaltaya-donsol-table-container">
+                            <table class="chacaltaya-donsol-table">
+                                <tr>
+                                    <th>BOLIVIANOS</th>
+                                    <th>TIPO DE CAMBIO</th>
+                                    <th>TOTAL SOLES</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="number" class="chacaltaya-donsol-input bs-input" value="0" step="0.01" min="0" inputmode="decimal">
+                                    </td>
+                                    <td class="chacaltaya-donsol-tc-cell">
+                                        <div class="chacaltaya-donsol-tc-value tc-display">3.87</div>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="chacaltaya-donsol-input soles-input" value="0" step="0.01" min="0" inputmode="decimal">
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div class="chacaltaya-donsol-depositar">
+                                DEPOSITAR <span class="chacaltaya-donsol-depositar-monto bs-display">0</span> BS PARA <span class="chacaltaya-donsol-depositar-monto soles-display">0</span> SOLES
+                            </div>
+                            
+                            <div class="chacaltaya-donsol-nota">
+                                Válido por 10 minutos - sujeto a variación
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-chacaltaya-bs-soles')">📸 GUARDAR IMAGEN</button>
+                </div>
+
+                <div class="tabla-con-boton">
+                    <div class="container tabla-2" id="tabla-kollita-bs-soles">
+                        <div class="header">
+                            <div class="contenedor-titulo">
+                                <div class="titulo">CAMBIO KOLLITA EXPRESS</div>
+                            </div>
+                            <div class="fecha" id="fecha-2"></div>
+                        </div>
+
+                        <table class="tabla-principal">
+                            <tr>
+                                <td colspan="3" class="titulo-seccion">BOLIVIANOS A SOLES</td>
+                            </tr>
+                            <tr class="fila-bolivianos">
+                                <td class="monto">
+                                    <input type="number" class="input-campo bs-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>BOLIVIANOS</td>
+                                <td class="tipo-cambio-cell">
+                                    <div class="tipo-cambio-label">TIPO DE CAMBIO</div>
+                                    <div class="tipo-cambio-valor tc-display">3.87</div>
+                                </td>
+                            </tr>
+                            <tr class="fila-soles">
+                                <td class="monto">
+                                    <input type="number" class="input-campo soles-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>SOLES</td>
+                                <td class="celda-vacia"></td>
+                            </tr>
+                        </table>
+
+                        <div class="depositar-fila">
+                            DEPOSITAR <span class="depositar-monto bs-display">0</span> BS PARA <span class="depositar-monto soles-display">0</span> SOLES
+                        </div>
+
+                        <div class="nota">
+                            Válido por 10 minutos - sujeto a variación
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-kollita-bs-soles')">📸 GUARDAR IMAGEN</button>
+                </div>
+            </div>
+
+            <div class="columna-direccion">
+                <div class="tabla-con-boton">
+                    <div class="container tabla-3" id="tabla-lunita-bs-soles">
+                        <div class="header">
+                            <div class="contenedor-titulo">
+                                <div class="titulo">PUNTO DE CAMBIO LUNITA</div>
+                            </div>
+                            <div class="fecha" id="fecha-3"></div>
+                        </div>
+
+                        <table class="tabla-principal">
+                            <tr>
+                                <td colspan="3" class="titulo-seccion">BOLIVIANOS A SOLES</td>
+                            </tr>
+                            <tr class="fila-bolivianos">
+                                <td class="tipo-cambio-cell">
+                                    <div class="tipo-cambio-label">T/C</div>
+                                    <div class="tipo-cambio-valor tc-display">3.87</div>
+                                </td>
+                                <td class="monto">
+                                    <input type="number" class="input-campo bs-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>BOLIVIANOS</td>
+                            </tr>
+                            <tr class="fila-soles">
+                                <td class="celda-vacia"></td>
+                                <td class="monto">
+                                    <input type="number" class="input-campo soles-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>SOLES</td>
+                            </tr>
+                        </table>
+
+                        <div class="depositar-fila">
+                            DEPOSITAR <span class="depositar-monto bs-display">0</span> BS PARA <span class="depositar-monto soles-display">0</span> SOLES
+                        </div>
+
+                        <div class="nota">
+                            Válido por 10 minutos - sujeto a variación
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-lunita-bs-soles')">📸 GUARDAR IMAGEN</button>
+                </div>
+
+                <div class="tabla-con-boton">
+                    <div class="donsol-container" id="tabla-donsol-bs-soles">
+                        <div class="donsol-header">
+                            <div class="donsol-titulo">CASA DE CAMBIOS DONSOL</div>
+                            <div class="donsol-fecha" id="fecha-donsol-1"></div>
+                            <div class="donsol-subtitle">BOLIVIANOS A SOLES</div>
+                        </div>
+                        
+                        <div class="donsol-table-container">
+                            <table class="donsol-table">
+                                <tr>
+                                    <th>BOLIVIANOS</th>
+                                    <th>TIPO DE CAMBIO</th>
+                                    <th>TOTAL SOLES</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="number" id="bolivianos-donsol-1" class="donsol-input" value="0" step="0.01" inputmode="decimal">
+                                    </td>
+                                    <td>
+                                        <input type="number" id="tipoCambio-donsol-1" class="donsol-input" value="3.87" step="0.01" inputmode="decimal">
+                                    </td>
+                                    <td>
+                                        <input type="number" id="totalSoles-donsol-1" class="donsol-input" value="0" step="0.01" inputmode="decimal">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="depositar-fila">
+                            DEPOSITAR <span id="depositar-bs-donsol-1">0</span> BS PARA <span id="depositar-soles-donsol-1">0</span> SOLES
+                        </div>
+                        
+                        <div class="donsol-nota">
+                            Válido por 10 minutos - sujeto a variación
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-donsol-bs-soles')">📸 GUARDAR IMAGEN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="contenido-pestana" id="pestana-soles-bs">
+        <div class="grid-dos-columnas">
+            <div class="columna-direccion">
+                <div class="tabla-con-boton">
+                    <div class="chacaltaya-donsol-container" id="tabla-chacaltaya-soles-bs">
+                        <div class="chacaltaya-donsol-header">
+                            <div class="chacaltaya-donsol-titulo">CAMBIOS CHACALTAYA</div>
+                            <div class="chacaltaya-donsol-fecha" id="fecha-4"></div>
+                            <div class="chacaltaya-donsol-subtitle">SOLES A BOLIVIANOS</div>
+                        </div>
+                        
+                        <div class="chacaltaya-donsol-table-container">
+                            <table class="chacaltaya-donsol-table">
+                                <tr>
+                                    <th>SOLES</th>
+                                    <th>TIPO DE CAMBIO</th>
+                                    <th>TOTAL BOLIVIANOS</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="number" class="chacaltaya-donsol-input soles-input" value="0" step="0.01" min="0" inputmode="decimal">
+                                    </td>
+                                    <td class="chacaltaya-donsol-tc-cell">
+                                        <div class="chacaltaya-donsol-tc-value tc-display">3.82</div>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="chacaltaya-donsol-input bs-input" value="0" step="0.01" min="0" inputmode="decimal">
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div class="chacaltaya-donsol-depositar">
+                                DEPOSITAR <span class="chacaltaya-donsol-depositar-monto soles-display">0</span> SOLES PARA <span class="chacaltaya-donsol-depositar-monto bs-display">0</span> BS
+                            </div>
+                            
+                            <div class="chacaltaya-donsol-nota">
+                                Válido por 10 minutos - sujeto a variación
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-chacaltaya-soles-bs')">📸 GUARDAR IMAGEN</button>
+                </div>
+
+                <div class="tabla-con-boton">
+                    <div class="container tabla-5" id="tabla-kollita-soles-bs">
+                        <div class="header">
+                            <div class="contenedor-titulo">
+                                <div class="titulo">CAMBIO KOLLITA EXPRESS</div>
+                            </div>
+                            <div class="fecha" id="fecha-5"></div>
+                        </div>
+
+                        <table class="tabla-principal">
+                            <tr>
+                                <td colspan="3" class="titulo-seccion">SOLES A BOLIVIANOS</td>
+                            </tr>
+                            <tr class="fila-bolivianos">
+                                <td class="monto">
+                                    <input type="number" class="input-campo bs-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>BOLIVIANOS</td>
+                                <td class="tipo-cambio-cell">
+                                    <div class="tipo-cambio-label">TIPO DE CAMBIO</div>
+                                    <div class="tipo-cambio-valor tc-display">3.82</div>
+                                </td>
+                            </tr>
+                            <tr class="fila-soles">
+                                <td class="monto">
+                                    <input type="number" class="input-campo soles-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>SOLES</td>
+                                <td class="celda-vacia"></td>
+                            </tr>
+                        </table>
+
+                        <div class="depositar-fila">
+                            DEPOSITAR <span class="depositar-monto soles-display">0</span> SOLES PARA <span class="depositar-monto bs-display">0</span> BS
+                        </div>
+
+                        <div class="nota">
+                            Válido por 10 minutos - sujeto a variación
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-kollita-soles-bs')">📸 GUARDAR IMAGEN</button>
+                </div>
+            </div>
+
+            <div class="columna-direccion">
+                <div class="tabla-con-boton">
+                    <div class="container tabla-6" id="tabla-lunita-soles-bs">
+                        <div class="header">
+                            <div class="contenedor-titulo">
+                                <div class="titulo">PUNTO DE CAMBIOS LUNITA</div>
+                            </div>
+                            <div class="fecha" id="fecha-6"></div>
+                        </div>
+
+                        <table class="tabla-principal">
+                            <tr>
+                                <td colspan="3" class="titulo-seccion">SOLES A BOLIVIANOS</td>
+                            </tr>
+                            <tr class="fila-bolivianos">
+                                <td class="tipo-cambio-cell">
+                                    <div class="tipo-cambio-label">T/C</div>
+                                    <div class="tipo-cambio-valor tc-display">3.82</div>
+                                </td>
+                                <td class="monto">
+                                    <input type="number" class="input-campo bs-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>BOLIVIANOS</td>
+                            </tr>
+                            <tr class="fila-soles">
+                                <td class="celda-vacia"></td>
+                                <td class="monto">
+                                    <input type="number" class="input-campo soles-input" value="" min="0" step="0.01" inputmode="decimal">
+                                </td>
+                                <td>SOLES</td>
+                            </tr>
+                        </table>
+
+                        <div class="depositar-fila">
+                            DEPOSITAR <span class="depositar-monto soles-display">0</span> SOLES PARA <span class="depositar-monto bs-display">0</span> BS
+                        </div>
+
+                        <div class="nota">
+                            Válido por 10 minutos - sujeto a variación
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-lunita-soles-bs')">📸 GUARDAR IMAGEN</button>
+                </div>
+
+                <div class="tabla-con-boton">
+                    <div class="donsol-container" id="tabla-donsol-soles-bs">
+                        <div class="donsol-header">
+                            <div class="donsol-titulo">CASA DE CAMBIOS DONSOL</div>
+                            <div class="donsol-fecha" id="fecha-donsol-2"></div>
+                            <div class="donsol-subtitle">DE SOLES A BOLIVIANOS</div>
+                        </div>
+                        
+                        <div class="donsol-table-container">
+                            <table class="donsol-table">
+                                <tr>
+                                    <th>SOLES</th>
+                                    <th>TIPO DE CAMBIO</th>
+                                    <th>TOTAL BOLIVIANOS</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="number" id="soles-donsol-2" class="donsol-input" value="0" step="0.01" inputmode="decimal">
+                                    </td>
+                                    <td>
+                                        <input type="number" id="tipoCambio-donsol-2" class="donsol-input" value="3.82" step="0.01" inputmode="decimal">
+                                    </td>
+                                    <td>
+                                        <input type="number" id="totalBolivianos-donsol-2" class="donsol-input" value="0" step="0.01" inputmode="decimal">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="depositar-fila">
+                            DEPOSITAR <span id="depositar-soles-donsol-2">0</span> SOLES PARA <span id="depositar-bs-donsol-2">0</span> BS
+                        </div>
+                        
+                        <div class="donsol-nota">
+                            Válido por 10 minutos - sujeto a variación
+                        </div>
+                    </div>
+                    <button class="btn-guardar-imagen" onclick="guardarTablaComoImagen('tabla-donsol-soles-bs')">📸 GUARDAR IMAGEN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="boton-reset-zoom" id="boton-reset-zoom" onclick="resetZoom()">↺</button>
+</body>
+</html>
